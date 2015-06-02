@@ -36,6 +36,25 @@ labels_train   = labels_train[:150]
 
 
 ### your code goes here
+from time import time
+from sklearn import tree
+clf = tree.DecisionTreeClassifier()
+clf = clf.fit(features_train, labels_train)
 
+t0=time()
+clf.fit(features_train, labels_train)
+print "training time:", round(time()-t0, 3), "s"
+
+t1=time()
+pred=clf.predict(features_test)
+print "predict time:", round(time()-t1, 3), "s"
+
+from sklearn.metrics import accuracy_score
+acc = accuracy_score(pred, labels_test)
+print "accuracy: ",acc
+
+for num, imp in enumerate(clf.feature_importances_):
+    if imp>0.2:
+        print num,imp,vectorizer.get_feature_names()[num]
 
 
