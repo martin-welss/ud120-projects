@@ -10,7 +10,7 @@ from tester import test_classifier, dump_classifier_and_data
 ### Task 1: Select what features you'll use.
 ### features_list is a list of strings, each of which is a feature name.
 ### The first feature must be "poi".
-features_list = ['poi','total_stock_value','total_payments','expenses', 'other', 'restricted_stock', 'salary', 'bonus'] # You will need to use more features
+features_list = ['poi','from_this_person_to_poi', 'total_stock_value','total_payments','expenses', 'other', 'restricted_stock','salary', 'bonus'] # You will need to use more features
 #features_list = ['poi','total_stock_value'] 
 
 
@@ -19,20 +19,30 @@ data_dict = pickle.load(open("final_project_dataset.pkl", "r") )
 
 ### Task 2: Remove outliers
 data_dict.pop('TOTAL',0)
+
 ### Task 3: Create new feature(s)
 
-features_list2=['poi']
+for person in data_dict:
+    # bonus by salary
+    bonus=data_dict[person]['bonus']
+    salary=data_dict[person]['salary']
+    if bonus!="NaN" and salary!="NaN":
+        data_dict[person]['bonus_by_salary']=float(bonus)/salary
+    else:
+        data_dict[person]['bonus_by_salary']="NaN"
 
-for feature in features_list[1:]:
-    nf=feature+'_boolean'
-    features_list2.append(nf)
-    for person in data_dict:
-        if data_dict[person][feature]=="NaN" or data_dict[person][feature]==0:
-            data_dict[person][nf]=0
-        else:
-            data_dict[person][nf]=1
+    # fraction of emails from poi
+    from_all=data_dict[person]['from_messages']
+    from_poi=data_dict[person]['from_poi_to_this_person']
+    if from_all!="NaN" and from_poi!="NaN":
+        data_dict[person]['email_fraction_from_poi']=float(from_poi)/from_all
+    else:
+        data_dict[person]['email_fraction_from_poi']="NaN"
+    
 
-#features_list=features_list2
+
+features_list.append('bonus_by_salary')
+features_list.append('email_fraction_from_poi')
 
 ### Store to my_dataset for easy export below.
 my_dataset = data_dict
@@ -52,20 +62,15 @@ labels, features = targetFeatureSplit(data)
 ### you'll need to use Pipelines. For more info:
 ### http://scikit-learn.org/stable/modules/pipeline.html
 
-#from sklearn.naive_bayes import GaussianNB
-#clf = GaussianNB()
-
-from sklearn import tree
-clf = tree.DecisionTreeClassifier(min_samples_split=2)
-
-from sklearn.svm import SVC
-#from sklearn.grid_search import GridSearchCV
-#param_grid = {
-#         'C': [1e3, 5e3, 1e4, 5e4, 1e5],
-#          'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1],
-#          }
-#clf = GridSearchCV(SVC(kernel='rbf', class_weight='auto'), param_grid)
-#clf = SVC(kernel="linear")
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.grid_search import GridSearchCV
+param_grid = {
+    'min_samples_split': [2, 3, 4],
+    'max_depth': [3,4,5],
+    'criterion': ['gini', 'entropy'],
+    'splitter': ['best', 'random']
+}
+clf = GridSearchCV(DecisionTreeClassifier(max_features='auto'), param_grid)
 
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
