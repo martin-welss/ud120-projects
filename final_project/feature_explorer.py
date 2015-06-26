@@ -31,11 +31,14 @@ def plot_scatter(feature1, feature2):
 
 def dump_feature(feature):
     nan=0
+    hit=0
     for person in data_dict:
         if data_dict[person][feature]=="NaN":
             nan+=1
-        print person, '\t\t', data_dict[person][feature]
-    print feature,"NaN count: ",nan
+        elif data_dict[person]['poi']:
+            hit+=1
+        print person[:8], '\t', data_dict[person]['poi'], data_dict[person][feature]
+    print feature,"NaN count: ",nan,"hit count: ",hit
 
 
 def plot_hist(feature):

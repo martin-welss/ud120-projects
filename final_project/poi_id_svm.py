@@ -11,7 +11,6 @@ from tester import test_classifier, dump_classifier_and_data
 ### features_list is a list of strings, each of which is a feature name.
 ### The first feature must be "poi".
 features_list = ['poi','total_stock_value','total_payments','expenses', 'other', 'restricted_stock', 'salary', 'bonus'] # You will need to use more features
-#features_list = ['poi','total_stock_value'] 
 
 
 ### Load the dictionary containing the dataset
@@ -21,18 +20,6 @@ data_dict = pickle.load(open("final_project_dataset.pkl", "r") )
 data_dict.pop('TOTAL',0)
 ### Task 3: Create new feature(s)
 
-features_list2=['poi']
-
-for feature in features_list[1:]:
-    nf=feature+'_boolean'
-    features_list2.append(nf)
-    for person in data_dict:
-        if data_dict[person][feature]=="NaN" or data_dict[person][feature]==0:
-            data_dict[person][nf]=0
-        else:
-            data_dict[person][nf]=1
-
-#features_list=features_list2
 
 ### Store to my_dataset for easy export below.
 my_dataset = data_dict
@@ -41,22 +28,12 @@ my_dataset = data_dict
 data = featureFormat(my_dataset, features_list, sort_keys = True)
 labels, features = targetFeatureSplit(data)
 
-#from sklearn.feature_selection import SelectKBest
-#from sklearn.feature_selection import chi2
-#X_new = SelectKBest(chi2, k=3).fit_transform(features, labels)
-#X_new.shape
 
 ### Task 4: Try a varity of classifiers
 ### Please name your classifier clf for easy export below.
 ### Note that if you want to do PCA or other multi-stage operations,
 ### you'll need to use Pipelines. For more info:
 ### http://scikit-learn.org/stable/modules/pipeline.html
-
-#from sklearn.naive_bayes import GaussianNB
-#clf = GaussianNB()
-
-from sklearn import tree
-clf = tree.DecisionTreeClassifier(min_samples_split=2)
 
 from sklearn.svm import SVC
 #from sklearn.grid_search import GridSearchCV
@@ -65,7 +42,7 @@ from sklearn.svm import SVC
 #          'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1],
 #          }
 #clf = GridSearchCV(SVC(kernel='rbf', class_weight='auto'), param_grid)
-#clf = SVC(kernel="linear")
+clf = SVC(kernel="poly")
 
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
