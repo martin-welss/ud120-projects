@@ -37,7 +37,7 @@ def dump_feature(feature):
             nan+=1
         elif data_dict[person]['poi']:
             hit+=1
-        print person[:8], '\t', data_dict[person]['poi'], data_dict[person][feature]
+        print person, '\t', data_dict[person]['poi'], data_dict[person][feature]
     print feature,"NaN count: ",nan,"hit count: ",hit
 
 
