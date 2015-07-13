@@ -10,15 +10,15 @@ from tester import test_classifier, dump_classifier_and_data
 ### Task 1: Select what features you'll use.
 ### features_list is a list of strings, each of which is a feature name.
 ### The first feature must be "poi".
-#features_list = ['poi','salary', 'bonus', 'total_stock_value', 'exercised_stock_options']
-features_list = ['poi','total_stock_value', 'restricted_stock', 'salary', 'bonus']
+features_list = ['poi', 'deferred_income', 'exercised_stock_options', 'from_messages']
+
 
 ### Load the dictionary containing the dataset
 data_dict = pickle.load(open("final_project_dataset.pkl", "r") )
 
 ### Task 2: Remove outliers
 data_dict.pop('TOTAL',0)
-
+data_dict.pop('THE TRAVEL AGENCY IN THE PARK',0)
 ### Task 3: Create new feature(s)
 
 for person in data_dict:
@@ -41,7 +41,6 @@ for person in data_dict:
 
 
 features_list.append('bonus_by_salary')
-
 #features_list.append('email_fraction_from_poi')
 
 ### Store to my_dataset for easy export below.
@@ -58,8 +57,15 @@ labels, features = targetFeatureSplit(data)
 ### you'll need to use Pipelines. For more info:
 ### http://scikit-learn.org/stable/modules/pipeline.html
 
-from sklearn.naive_bayes import GaussianNB
-clf = GaussianNB()
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.grid_search import GridSearchCV
+param_grid = {
+    'min_samples_split': [2, 3, 4],
+    'max_depth': [3,4,5],
+    'criterion': ['gini', 'entropy'],
+    'splitter': ['best', 'random']
+}
+clf = GridSearchCV(DecisionTreeClassifier(max_features='auto'), param_grid)
 
 
 ### Task 5: Tune your classifier to achieve better than .3 precision and recall 
